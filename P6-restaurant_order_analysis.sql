@@ -12307,8 +12307,13 @@ INSERT INTO menu_items VALUES (101, 'Hamburger', 'American', 12.95),
 (131, 'Chicken Parmesan', 'Italian', 17.95),
 (132, 'Eggplant Parmesan', 'Italian', 16.95);
 
+
 -- First, I'll go through menu_items and get familiarize with the dataset;
--- Here, I'll answe the following questions regarding menu_items table;
+-- Here, I'll answer the following questions regarding menu_items table;
+
+
+
+-- Objective 1;
 
 USE restaurant_db;
 
@@ -12377,6 +12382,10 @@ GROUP BY category;
 -- Similarly, I'll go through order_details table and get familiarize with the data;
 -- Here, I'll answer the following questions regarding order_details table;
 
+
+
+-- Objective 2;
+
 USE restaurant_db;
 
 -- 1. View the order details table;
@@ -12410,4 +12419,77 @@ SELECT COUNT(*) FROM
 FROM order_details
 GROUP BY order_id
 HAVING num_items > 12) AS num_orders;
+
+
+
+-- Objective 3;
+
+USE restaurant_db;
+
+-- 1. Combine the menu_items and order_details tables into a single table.
+
+SELECT *
+FROM order_details od
+LEFT JOIN menu_items mi
+ON od.item_id = mi.menu_item_id;
+
+-- 2. What were the least and most ordered items? What categories were they in?
+
+SELECT item_name, category, COUNT(order_details_id) As num_purchases
+FROM order_details od
+LEFT JOIN menu_items mi
+ON od.item_id = mi.menu_item_id
+GROUP BY item_name, category
+ORDER BY num_purchases
+LIMIT 1;
+
+SELECT item_name, category, COUNT(order_details_id) As num_purchases
+FROM order_details od
+LEFT JOIN menu_items mi
+ON od.item_id = mi.menu_item_id
+GROUP BY item_name, category
+ORDER BY num_purchases DESC
+LIMIT 1;
+
+-- 3. What were the top 5 orders that spent the most money?
+
+SELECT order_id, SUM(price) AS total_spend
+FROM order_details od
+LEFT JOIN menu_items mi
+ON od.item_id = mi.menu_item_id
+GROUP BY order_id
+ORDER BY total_spend DESC
+LIMIT 5;
+
+-- 4. View the details of the highest spend order. What insights can you gather from the result>
+
+SELECT category, COUNT(category) AS num_items, SUM(price) AS total_spend
+FROM order_details od
+LEFT JOIN menu_items mi
+ON od.item_id = mi.menu_item_id
+WHERE order_id = 440
+GROUP BY category
+ORDER BY num_items DESC;
+
+-- The data shows that the highest order id (440) orders italian food more as compared to the other categories;
+
+-- 5. View the details of the top 5 highest spend orders. What insights can you gather from the result?
+
+SELECT order_id, category, COUNT(category) AS num_items, SUM(price) AS total_spend
+FROM order_details od
+LEFT JOIN menu_items mi
+ON od.item_id = mi.menu_item_id
+WHERE order_id IN (440, 2075, 1957, 330, 2675)
+GROUP BY order_id, category;
+
+-- The data shows that the top 5 highest spend orders (440, 2075, 1975, 330, 2675) have ordered italian food more as compared to the other category;
+-- Also, italian food has the highest total spend amongst all categories;
+
+-- 6. How much was the most expensive order in the dataset?
+
+SELECT order_id, SUM(price) AS total_spend
+FROM order_details od
+LEFT JOIN menu_items mi
+ON od.item_id = mi.menu_item_id
+WHERE order_id = 440;
 
